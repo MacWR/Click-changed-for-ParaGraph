@@ -1,0 +1,30 @@
+{
+    "files.associations": {
+        "functional": "cpp",
+        "__locale": "cpp",
+        "__string": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "iostream": "cpp",
+        "iterator": "cpp",
+        "vector": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "atomic": "cpp",
+        "ios": "cpp",
+        "map": "cpp",
+        "system_error": "cpp",
+        "chrono": "cpp",
+        "__bit_reference": "cpp",
+        "algorithm": "cpp",
+        "iosfwd": "cpp",
+        "xlocale": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp",
+        "ostream": "cpp",
+        "xlocnum": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}
