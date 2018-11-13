@@ -1,21 +1,21 @@
 // -*- c-basic-offset: 4 -*-
-#ifndef CLICK_CLIPBOARDWITHDISCARD_HH
-#define CLICK_CLIPBOARDWITHDISCARD_HH
+#ifndef CLICK_IPClipboardWithDiscard_HH
+#define CLICK_IPClipboardWithDiscard_HH
 #include <click/element.hh>
 CLICK_DECLS
 
 /*
 =c
-ClipboardWithDiscard(RANGE_1, ..., RANGE_N)
+IPClipboardWithDiscard(RANGE_1, ..., RANGE_N)
 
 =s basicmod
 copies data from one packet to another and set checksums
 
 =d
-Takes as arguments one or more byte ranges to copy. When ClipboardWithDiscard
-receives a packet on input 0, it copies the selected bytes to the clipboardWithDiscard 
+Takes as arguments one or more byte ranges to copy. When IPClipboardWithDiscard
+receives a packet on input 0, it copies the selected bytes to the IPClipboardWithDiscard 
 buffer while its 7th Byte annotation is 251 means the packet having been modified 
-and drops the packet. When receiving a packet on input 1, ClipboardWithDiscard
+and drops the packet. When receiving a packet on input 1, IPClipboardWithDiscard
 updates the packet with the bytes from the buffer while its 7th Byte annotation 
 is 251 or 250 and outputs the modified packet on output 0. This way, data from 
 a single packet can be copied to 0 or more packets.
@@ -23,10 +23,10 @@ a single packet can be copied to 0 or more packets.
 Each RANGE is on the form C<x/n>, where C<x> is the offset and C<n> the number
 of bytes.
 
-Each ClipboardWithDiscard input/output pair can work in either a push or a pull context.
+Each IPClipboardWithDiscard input/output pair can work in either a push or a pull context.
 
-ClipboardWithDiscard can also be used to copy data from one place in a packet to another,
-by looping the same packet back through ClipboardWithDiscard and using Strip and Unstrip
+IPClipboardWithDiscard can also be used to copy data from one place in a packet to another,
+by looping the same packet back through IPClipboardWithDiscard and using Strip and Unstrip
 to offset the packet data.
 
 Passing a packet through input 1 before any packets have passed through
@@ -44,11 +44,11 @@ struct Range3 {
 };
 
 
-class ClipboardWithDiscard : public Element {
+class IPClipboardWithDiscard : public Element {
 public:
-    ClipboardWithDiscard() CLICK_COLD;
+    IPClipboardWithDiscard() CLICK_COLD;
 
-    const char *class_name() const { return "ClipboardWithDiscard"; }
+    const char *class_name() const { return "IPClipboardWithDiscard"; }
     const char *flags()      const { return "S0"; }
     const char *flow_code()  const { return "#/#"; }
     const char *port_count() const { return "2/1"; }
@@ -64,7 +64,7 @@ public:
     void set_TCPchecksum(WritablePacket *p_in);
 
 private:
-    Vector<unsigned char> _ClipboardWithDiscard;
+    Vector<unsigned char> _IPClipboardWithDiscard;
     Vector<Range3> _ranges;
     uint32_t _minPacketLength;
     bool _dropped;
