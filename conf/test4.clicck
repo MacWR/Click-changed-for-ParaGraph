@@ -1,0 +1,9 @@
+from::FromDevice(ens34)
+tee::Tee(3)
+discard::Discard
+
+from -> tee
+
+tee[0] -> Print(0) ->discard
+tee[1] -> Print(1) -> discard
+tee[2] -> Print(2)-> discard
