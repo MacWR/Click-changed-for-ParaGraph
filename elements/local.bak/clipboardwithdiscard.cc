@@ -1,10 +1,10 @@
 // -*- c-basic-offset: 4 -*-
 /*
- * IPClipboardWithDiscard.{cc,hh} -- copies data from one packet to another
+ * ClipboardWithDiscard.{cc,hh} -- copies data from one packet to another
  * Rui Wang
  */
 #include <click/config.h>
-#include "ipclipboardwithdiscard.hh"
+#include "clipboardwithdiscard.hh"
 #include <click/args.hh>
 #include <click/error.hh>
 #include <clicknet/ip.h>
@@ -13,13 +13,13 @@
 CLICK_DECLS
 
 
-IPClipboardWithDiscard::IPClipboardWithDiscard():_dropped(false),_copied(false)
+ClipboardWithDiscard::ClipboardWithDiscard():_dropped(false),_copied(false)
 {
 }
 
 
 int
-IPClipboardWithDiscard::configure(Vector<String> &conf, ErrorHandler *errh)
+ClipboardWithDiscard::configure(Vector<String> &conf, ErrorHandler *errh)
 {
     Vector<Range3> ranges = Vector<Range3>();
     Range3 range;
@@ -51,13 +51,13 @@ IPClipboardWithDiscard::configure(Vector<String> &conf, ErrorHandler *errh)
     }
 
     _ranges = ranges;
-    _IPClipboardWithDiscard.resize(clipboardSize);
+    _ClipboardWithDiscard.resize(clipboardSize);
     return 0;
 }
 
 
 Packet *
-IPClipboardWithDiscard::pull(int port)
+ClipboardWithDiscard::pull(int port)
 {
     Packet *p = input(port).pull();
     if (!p) return NULL;
@@ -95,7 +95,7 @@ IPClipboardWithDiscard::pull(int port)
 
 
 void
-IPClipboardWithDiscard::push(int port, Packet *p)
+ClipboardWithDiscard::push(int port, Packet *p)
 {   
     bool discard_this_packet = false;
     if ( port == 0 ){
@@ -107,7 +107,7 @@ IPClipboardWithDiscard::push(int port, Packet *p)
         if ( p->anno_u8(7) == (uint8_t)252 ) { // dopping: set the flag _dropped to true
             _dropped = true;
         }
-	    discard_this_packet = true;
+	discard_this_packet = true;
     }else{  //port == 1
         if ( _dropped ){ 
             _dropped = false;
@@ -125,20 +125,21 @@ IPClipboardWithDiscard::push(int port, Packet *p)
         }
     }
     if ( discard_this_packet ){
-	    discard_this_packet = false;
-	    checked_output_push(1, p);
+	discard_this_packet = false;
+	checked_output_push(1, p);
     }
     else{
-	    output(0).push(p);
+	output(0).push(p);
     }
+    
 }
 
 
 void
-IPClipboardWithDiscard::copy(Packet *p)
+ClipboardWithDiscard::copy(Packet *p)
 {
-    // Configure guarantees us that _IPClipboardWithDiscard is big enough to hold all ranges.
-    unsigned char *dst = &_IPClipboardWithDiscard[0];
+    // Configure guarantees us that _ClipboardWithDiscard is big enough to hold all ranges.
+    unsigned char *dst = &_ClipboardWithDiscard[0];
     for (int i = 0; i < _ranges.size(); i++) {
         Range3 range = _ranges[i];
         const unsigned char *src = p->data() + range.offset;
@@ -149,14 +150,14 @@ IPClipboardWithDiscard::copy(Packet *p)
 
 
 Packet *
-IPClipboardWithDiscard::paste(Packet *p)
+ClipboardWithDiscard::paste(Packet *p)
 {
     if (p->length() < _minPacketLength) return p;
 
     WritablePacket *q = p->uniqueify();
     if (!q) return NULL;
 
-    const unsigned char *src = &_IPClipboardWithDiscard[0];
+    const unsigned char *src = &_ClipboardWithDiscard[0];
     unsigned char *dst = q->data();
 
     for (int i = 0; i < _ranges.size(); i++) {
@@ -181,7 +182,7 @@ IPClipboardWithDiscard::paste(Packet *p)
 }
 
 void
-IPClipboardWithDiscard::set_IPchecksum(WritablePacket *p_in) {
+ClipboardWithDiscard::set_IPchecksum(WritablePacket *p_in) {
     unsigned char *nh_data = p_in->network_header();
     click_ip *iph = reinterpret_cast<click_ip *>(nh_data);
     unsigned plen = p_in->end_data() - nh_data;
@@ -196,7 +197,7 @@ IPClipboardWithDiscard::set_IPchecksum(WritablePacket *p_in) {
 }
 
 void
-IPClipboardWithDiscard::set_UDPchecksum(WritablePacket *p_in) {
+ClipboardWithDiscard::set_UDPchecksum(WritablePacket *p_in) {
     // check IP header/UDP protocol?
     click_ip *iph = p_in->ip_header();
     click_udp *udph = reinterpret_cast<click_udp *>(p_in->network_header()+ (iph->ip_hl << 2));
@@ -209,7 +210,7 @@ IPClipboardWithDiscard::set_UDPchecksum(WritablePacket *p_in) {
 }
 
 void
-IPClipboardWithDiscard::set_TCPchecksum(WritablePacket *p_in) {
+ClipboardWithDiscard::set_TCPchecksum(WritablePacket *p_in) {
     click_ip *iph = p_in->ip_header();
     click_tcp *tcph = reinterpret_cast<click_tcp *>(p_in->network_header() + (iph->ip_hl << 2));
     unsigned plen = ntohs(iph->ip_len) - (iph->ip_hl << 2);
@@ -231,4 +232,5 @@ IPClipboardWithDiscard::set_TCPchecksum(WritablePacket *p_in) {
 
 
 CLICK_ENDDECLS
-EXPORT_ELEMENT(IPClipboardWithDiscard)
+EXPORT_ELEMENT(ClipboardWithDiscard)
+
